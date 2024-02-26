@@ -1,5 +1,4 @@
-#include <stddef.h>
-#include <stdint.h>
+#include <kernel.h>
 
 #if defined(__linux__)
 	#error "This code must be compiled with a cross-compiler"
@@ -17,7 +16,7 @@ int term_row = 0;
 uint8_t term_color = 0x0F;
 
 
-void term_init(){
+void term_init(void){
    for(size_t col = 0; col <= VGA_COLS ;col++){
        for(size_t row = 0; row <= VGA_ROWS ;row++){
           const size_t index = (VGA_COLS * row) + col;
@@ -32,6 +31,11 @@ void _print_char(char c){
       term_col = 0;
       term_row++;
       break;
+    case '\t':
+      term_col += 8; // Normally tab is 8 char long
+      term_row = term_row;
+      break;
+    
     default:
       const size_t index = (VGA_COLS * term_row) + term_col;
       vga_buffer[index] = ((uint16_t)term_color << 8) | c;
@@ -57,6 +61,7 @@ void _print(const char* text){
 
 void kernel_start(void){
   term_init();
-  _print("Kernel has started!");
+  _print("Kernel has started! \n");
   _print("Hello, World!");
+  
 }
